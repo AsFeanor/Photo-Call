@@ -8,7 +8,7 @@ export class Student {
   @Prop()
   studentId: string;
 
-  @Prop()
+  @Prop({ type: Object })
   photo: Buffer;
 
   @Prop({required: true})

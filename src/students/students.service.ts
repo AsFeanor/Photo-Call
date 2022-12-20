@@ -18,17 +18,18 @@ export class StudentsService {
     return this.studentModel.find();
   }
 
-  async createStudent(studentData): Promise<Student> {
+  async createStudent(photo, studentData): Promise<Student> {
     const student = {
       studentId: uuidv4(),
+      photo,
       ...studentData
     }
     const newStudent = new this.studentModel(student);
     return newStudent.save();
   }
 
-  async updateStudent(studentId: FilterQuery<Student>, studentUpdates: UpdateStudentDto): Promise<Student> {
-    return this.studentModel.findOneAndUpdate(studentId, studentUpdates, { new: true });
+  async updateStudent(student_number: FilterQuery<Student>, photo, studentUpdates: UpdateStudentDto): Promise<Student> {
+    return this.studentModel.findOneAndUpdate(student_number, { photo, ...studentUpdates }, { new: true });
   }
 
   async deleteStudent(studentId: FilterQuery<Student>): Promise<Student> {

@@ -1,9 +1,11 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { Express } from 'express'
 import { CreateStudentDto } from './dto/create-student.dto';
 
 import { Student } from './schemas/student.schema';
 import { StudentsService } from './students.service';
 import { UpdateStudentDto } from "./dto/update-student.dto";
+import { FileInterceptor } from "@nestjs/platform-express";
 
 @Controller('students')
 export class StudentsController {
@@ -20,13 +22,15 @@ export class StudentsController {
   }
 
   @Post()
-  async createStudent(@Body() createStudentDto: CreateStudentDto): Promise<Student> {
-    return this.studentsService.createStudent({ ...createStudentDto });
+  @UseInterceptors(FileInterceptor('photo'))
+  async createStudent(@UploadedFile() file: Express.Multer.File, @Body() createStudentDto: CreateStudentDto): Promise<Student> {
+    return this.studentsService.createStudent(file, { ...createStudentDto });
   }
 
-  @Patch(':studentId')
-  async updateStudent(@Param('studentId') studentId: string, @Body() updateStudentDto: UpdateStudentDto): Promise<Student> {
-    return this.studentsService.updateStudent({ studentId }, updateStudentDto);
+  @Patch(':student_number')
+  @UseInterceptors(FileInterceptor('photo'))
+  async updateStudent(@Param('student_number') student_number: string, @UploadedFile() file: Express.Multer.File, @Body() updateStudentDto: UpdateStudentDto): Promise<Student> {
+    return this.studentsService.updateStudent({ student_number }, file, updateStudentDto);
   }
 
   @Delete(':studentId')
