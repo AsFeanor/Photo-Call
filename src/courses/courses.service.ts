@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common";
-import { v4 as uuidv4 } from 'uuid';
 
 import { Course, CourseDocument } from "./schemas/course.schema";
 import { Student, StudentDocument } from "../students/schemas/student.schema";
 import { CreateCourseDto } from "./dto/create-course.dto";
 import { UpdateCourseDto } from "./dto/update-course.dto";
+import { UpdateAttendanceDto } from "./dto/update-attendance";
 import { FilterQuery, Model } from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
 
@@ -15,36 +15,41 @@ export class CoursesService {
     @InjectModel('Student') private readonly studentModel: Model<StudentDocument>,
   ) {}
 
-  async getCourseById(courseId: FilterQuery<Course>): Promise<Course> {
-    return this.courseModel.findOne(courseId);
+  async getCourseById(_id: FilterQuery<Course>): Promise<Course> {
+    return this.courseModel.findOne(_id).populate('students').populate('attendance.students');
   }
 
   async getCourses(): Promise<Course[]> {
     return this.courseModel.find();
   }
 
-  async updateCourse(courseId: FilterQuery<Course>, courseUpdates: UpdateCourseDto) {
-    const { name, student_ids } = courseUpdates;
-    const students = await this.studentModel.find({ student_number: { $in: student_ids } });
-    const updateData = {
-      name,
-      students: students.map(student => student),
-    }
-    return this.courseModel.findOneAndUpdate(courseId, updateData);
+  async updateCourse(_id: FilterQuery<Course>, courseUpdates: UpdateCourseDto) {
+    const course = await this.courseModel.findById(_id);
+    // @ts-ignore
+    course.students = courseUpdates.student_ids;
+    await course.save();
+    return course;
+  }
+
+  async updateAttendance(_id: FilterQuery<Course>, attendanceData: UpdateAttendanceDto) {
+    const course = await this.courseModel.findById(_id);
+    course.attendance.push({
+      session: attendanceData.session,
+      students: attendanceData.studentIds,
+    });
+    await course.save();
+    return course;
   }
 
   async createCourse(createCourseDto: CreateCourseDto): Promise<Course> {
-    const { name, student_ids } = createCourseDto;
-    const students = await this.studentModel.find({ student_number: { $in: student_ids } });
-    const createdCourse = new this.courseModel({
-      courseId: uuidv4(),
-      name,
-      students,
-    });
-    return createdCourse.save();
+    const course = new this.courseModel(createCourseDto);
+    // @ts-ignore
+    course.students = createCourseDto.student_ids;
+    await course.save();
+    return course;
   }
 
-  async deleteCourse(courseId: FilterQuery<Course>): Promise<Course> {
-    return this.courseModel.findOneAndDelete(courseId);
+  async deleteCourse(_id: FilterQuery<Course>): Promise<Course> {
+    return this.courseModel.findOneAndDelete(_id);
   }
   }

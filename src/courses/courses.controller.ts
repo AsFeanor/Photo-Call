@@ -1,17 +1,19 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Put } from "@nestjs/common";
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
+import { UpdateAttendanceDto } from "./dto/update-attendance";
 
 import { Course } from './schemas/course.schema';
 import { CoursesService } from './courses.service';
+import { ObjectId } from "mongoose";
 
 @Controller('courses')
 export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}
 
-  @Get(':courseId')
-  async getCourse(@Param('courseId') courseId: string): Promise<Course> {
-    return this.coursesService.getCourseById({ courseId });
+  @Get(':_id')
+  async getCourse(@Param('_id') _id: ObjectId): Promise<Course> {
+    return this.coursesService.getCourseById({ _id });
   }
 
   @Get()
@@ -24,13 +26,18 @@ export class CoursesController {
     return this.coursesService.createCourse(createCourseDto);
   }
 
-  @Patch(':courseId')
-  async updateCourse(@Param('courseId') courseId: string, @Body() updateCourseDto: UpdateCourseDto): Promise<Course> {
-    return this.coursesService.updateCourse({ courseId }, updateCourseDto);
+  @Patch(':_id')
+  async updateCourse(@Param('_id') _id: ObjectId, @Body() updateCourseDto: UpdateCourseDto): Promise<Course> {
+    return this.coursesService.updateCourse({ _id }, updateCourseDto);
   }
 
-  @Delete(':courseId')
-  async deleteCourse(@Param('courseId') courseId: string): Promise<Course> {
-    return this.coursesService.deleteCourse({ courseId });
+  @Patch(':_id/attendance')
+  async updateAttendance(@Param('_id') _id: ObjectId, @Body() updateAttendanceDto: UpdateAttendanceDto): Promise<Course> {
+    return this.coursesService.updateAttendance({ _id }, updateAttendanceDto);
+  }
+
+  @Delete(':_id')
+  async deleteCourse(@Param('_id') _id: ObjectId): Promise<Course> {
+    return this.coursesService.deleteCourse({ _id });
   }
 }

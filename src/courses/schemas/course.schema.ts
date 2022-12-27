@@ -1,19 +1,22 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document } from 'mongoose';
 import { Student, StudentDocument } from "../../students/schemas/student.schema";
+import * as mongoose from "mongoose";
 
-export type CourseDocument = Course & Document;
+export type CourseDocument = Course & mongoose.Document;
 
 @Schema()
 export class Course {
   @Prop()
-  courseId: string;
-
-  @Prop()
   name: string;
 
-  @Prop({ ref: 'Student', type: [typeof Student]})
-  students: StudentDocument[];
+  @Prop([{ ref: 'Student', type: mongoose.Schema.Types.ObjectId }])
+  students: [Student];
+
+  @Prop({ type: [{
+      session: Date,
+      students: [{ type: mongoose.Types.ObjectId, ref: 'Student' }]
+    }]})
+  attendance: any[];
 }
 
 export const CourseSchema = SchemaFactory.createForClass(Course);

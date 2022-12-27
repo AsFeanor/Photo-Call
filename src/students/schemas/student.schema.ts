@@ -5,9 +5,6 @@ export type StudentDocument = Student & Document;
 
 @Schema()
 export class Student {
-  @Prop()
-  studentId: string;
-
   @Prop({ type: Object })
   photo: Buffer;
 
@@ -16,7 +13,6 @@ export class Student {
 
   @Prop()
   name: string;
-
 }
 
 export const StudentSchema = SchemaFactory.createForClass(Student);

@@ -6,6 +6,7 @@ import { Student } from './schemas/student.schema';
 import { StudentsService } from './students.service';
 import { UpdateStudentDto } from "./dto/update-student.dto";
 import { FileInterceptor } from "@nestjs/platform-express";
+import { ObjectId } from "mongoose";
 
 @Controller('students')
 export class StudentsController {
@@ -33,8 +34,8 @@ export class StudentsController {
     return this.studentsService.updateStudent({ student_number }, file, updateStudentDto);
   }
 
-  @Delete(':studentId')
-  async deleteStudent(@Param('studentId') studentId: string): Promise<Student> {
-    return this.studentsService.deleteStudent({ studentId });
+  @Delete(':_id')
+  async deleteStudent(@Param('_id') _id: ObjectId): Promise<Student> {
+    return this.studentsService.deleteStudent({ _id });
   }
 }

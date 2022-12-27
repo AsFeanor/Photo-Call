@@ -1,5 +1,4 @@
 import { Injectable } from "@nestjs/common";
-import { v4 as uuidv4 } from 'uuid';
 
 import { Student, StudentDocument } from "./schemas/student.schema";
 import { UpdateStudentDto } from "./dto/update-student.dto";
@@ -20,7 +19,6 @@ export class StudentsService {
 
   async createStudent(photo, studentData): Promise<Student> {
     const student = {
-      studentId: uuidv4(),
       photo,
       ...studentData
     }
@@ -32,7 +30,7 @@ export class StudentsService {
     return this.studentModel.findOneAndUpdate(student_number, { photo, ...studentUpdates }, { new: true });
   }
 
-  async deleteStudent(studentId: FilterQuery<Student>): Promise<Student> {
-    return this.studentModel.findOneAndDelete(studentId);
+  async deleteStudent(_id: FilterQuery<Student>): Promise<Student> {
+    return this.studentModel.findOneAndDelete(_id);
   }
 }
