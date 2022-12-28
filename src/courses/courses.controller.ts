@@ -16,6 +16,11 @@ export class CoursesController {
     return this.coursesService.getCourseById({ _id });
   }
 
+  @Get(':_id/list')
+  async getCourseFromList(@Param('_id') _id: ObjectId): Promise<Course> {
+    return this.coursesService.getCourseFromList({ _id });
+  }
+
   @Get()
   async getCourses(): Promise<Course[]> {
     return this.coursesService.getCourses();

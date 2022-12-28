@@ -16,7 +16,11 @@ export class CoursesService {
   ) {}
 
   async getCourseById(_id: FilterQuery<Course>): Promise<Course> {
-    return this.courseModel.findOne(_id).populate('students').populate('attendance.students');
+    return this.courseModel.findOne(_id).populate('students');
+  }
+
+  async getCourseFromList(_id: FilterQuery<Course>): Promise<Course> {
+    return this.courseModel.findOne(_id).populate('students', 'name').populate('attendance.students', 'name');
   }
 
   async getCourses(): Promise<Course[]> {
