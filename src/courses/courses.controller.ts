@@ -6,6 +6,8 @@ import { UpdateAttendanceDto } from "./dto/update-attendance";
 import { Course } from './schemas/course.schema';
 import { CoursesService } from './courses.service';
 import { ObjectId } from "mongoose";
+import { AddStudentDto } from "./dto/add-student.dto";
+import { RemoveStudentDto } from "./dto/remove-student.dto";
 
 @Controller('courses')
 export class CoursesController {
@@ -36,9 +38,24 @@ export class CoursesController {
     return this.coursesService.updateCourse({ _id }, updateCourseDto);
   }
 
+  @Patch(':_id/add_students')
+  async addStudents(@Param('_id') _id: ObjectId, @Body() addStudentDto: AddStudentDto): Promise<Course> {
+    return this.coursesService.addStudentsToCourse({ _id }, addStudentDto);
+  }
+
+  @Patch(':_id/remove_student')
+  async removeStudent(@Param('_id') _id: ObjectId, @Body() removeStudentDto: RemoveStudentDto): Promise<Course> {
+    return this.coursesService.removeStudentFromCourse({ _id }, removeStudentDto);
+  }
+
   @Patch(':_id/attendance')
   async updateAttendance(@Param('_id') _id: ObjectId, @Body() updateAttendanceDto: UpdateAttendanceDto): Promise<Course> {
     return this.coursesService.updateAttendance({ _id }, updateAttendanceDto);
+  }
+
+  @Patch('_id/remove_attendance')
+  async deleteAttendance(@Param('_id') _id: ObjectId, @Body() courseId: ObjectId): Promise<Course> {
+    return this.coursesService.deleteAttendance({ _id }, courseId);
   }
 
   @Delete(':_id')
