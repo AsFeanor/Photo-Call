@@ -17,7 +17,10 @@ export class Lecturer {
   passwordSalt: string;
 
   @Prop({ required: true })
-  name: string
+  name: string;
+
+  @Prop()
+  isSuperUser: Boolean;
 
   @Prop([{ ref: 'Course', type: mongoose.Schema.Types.ObjectId }])
   courses: [Course];

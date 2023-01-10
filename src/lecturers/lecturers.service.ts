@@ -1,9 +1,9 @@
 import { Injectable } from "@nestjs/common";
-import { v4 as uuidv4 } from 'uuid';
-import * as bcrypt from 'bcrypt';
+import { v4 as uuidv4 } from "uuid";
+import * as bcrypt from "bcrypt";
 
 import { Lecturer, LecturerDocument } from "./schemas/lecturer.schema";
-import { FilterQuery, Model } from "mongoose";
+import { FilterQuery, Model, ObjectId } from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
 
 @Injectable()
@@ -12,6 +12,10 @@ export class LecturersService {
 
   async getLecturerById(lecturerId: FilterQuery<Lecturer>): Promise<Lecturer> {
     return this.lecturerModel.findOne(lecturerId);
+  }
+
+  async getLecturerForCourses(email: FilterQuery<Lecturer>): Promise<Lecturer> {
+    return this.lecturerModel.findOne(email).populate('courses');
   }
 
   async getLecturers(): Promise<Lecturer[]> {
@@ -30,8 +34,10 @@ export class LecturersService {
     const saltRounds = 10;
     const passwordHash = await bcrypt.hash(lecturerData.password, saltRounds);
     const passwordSalt = await bcrypt.genSalt(saltRounds);
+    const superUserControl = lecturerData.isSuperUser ? lecturerData.isSuperUser : false;
     const createdLecturer = new this.lecturerModel({
       ...lecturerData,
+      isSuperUser: superUserControl,
       passwordHash,
       passwordSalt
     });
@@ -51,4 +57,11 @@ export class LecturersService {
     return lecturer;
   }
 
+  async update(_id: ObjectId, lecturerData: Partial<Lecturer>): Promise<Lecturer> {
+    return await this.lecturerModel.findByIdAndUpdate(_id, lecturerData, { new: true }).exec();
+  }
+
+  async deleteLecturer(_id: FilterQuery<Lecturer>): Promise<Lecturer> {
+    return this.lecturerModel.findOneAndDelete(_id);
+  }
 }
